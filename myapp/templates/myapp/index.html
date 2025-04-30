@@ -1,0 +1,273 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Homepage</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.6.0/dist/chart.min.js"></script>
+    <link rel="stylesheet" href="{% static 'myapp/styles.css' %}">
+</head>
+<body>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="file" id="file">
+        <input type="submit" name="submit" id="">
+    </form>
+
+
+    <table id="table">
+        <thead>
+            <tr>
+                <th>Property Name</th>
+                <th>Price</th>
+                <th>Rent</th>
+                <th>EMI</th>
+                <th>Tax</th>
+                <th>Monthly Expense</th>
+                <th>Net Expenses</th>
+                <th>Net Income</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for object in data_objects %}
+            <tr>
+                <td>{{object.name}}</td>
+                <td>{{object.price}}</td>
+                <td>{{object.rent}}</td>
+                <td>{{object.emi}}</td>
+                <td>{{object.tax}}</td>
+                <td>{{object.exp}}</td>
+                <td>{{object.expenses_monthly}}</td>
+                <td>{{object.income_monthly}}</td>
+            </tr>
+            {% endfor%}
+            <tr>
+                <td>Total</td>
+                <td id = "totalPrice">0</td>
+                <td id = "totalRent">0</td>
+                <td id = "totalEmi">0</td>
+                <td id = "totalTax">0</td>
+                <td id = "totalExp">0</td>
+                <td id = "totalMonthlyExpense">0</td>
+                <td id = "totalIncome">0</td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    <canvas id="incomeChart" width="400" height="100"></canvas>
+    <canvas id="expenseChart" width="400" height="100"></canvas>
+    <canvas id="expenseSpreadChart" width="400" height="100"></canvas>
+    <canvas id="incomeSpreadChart" width="400" height="100"></canvas>
+    
+    </br>
+    <script>
+        table = document.getElementById("table")
+        let net_prices, net_rent, net_emi, net_tax, net_exp, net_monthly_expense, net_monthly_income= 0;
+        let Property = ""
+        let total_prices = 0, total_rent = 0, total_emi = 0, total_tax = 0, total_exp =0, total_monthly_expense= 0, total_monthly_income = 0;
+
+        let net_incomes = []
+        let properties = []
+        let net_expenses = []
+        let net_emis = []
+        let net_taxes = []
+        let net_exps = []
+
+
+        for (let i=1; i < table.rows.length - 1; i++){
+            net_prices = table.rows[i].cells[1].innerText;
+            net_rent = table.rows[i].cells[2].innerText;
+            net_emi = table.rows[i].cells[3].innerText;
+            net_tax = table.rows[i].cells[4].innerText;
+            net_exp = table.rows[i].cells[5].innerText;
+            net_monthly_expense = table.rows[i].cells[6].innerText;
+            net_monthly_income = table.rows[i].cells[7].innerText;
+            property = table.rows[i].cells[0].innerText;
+            
+
+            net_incomes.push(net_monthly_income)
+            properties.push(property)
+            net_expenses.push(net_monthly_expense)
+            net_emis.push(net_emi)
+            net_taxes.push(net_tax)
+            net_exps.push(net_exp)            
+
+            net_prices = parseInt(net_prices)
+            net_rent = parseInt(net_rent)
+            net_emi = parseInt(net_emi)
+            net_tax = parseInt(net_tax)
+            net_exp = parseInt(net_exp)
+            net_monthly_expense = parseInt(net_monthly_expense)
+            net_monthly_income = parseInt(net_monthly_income)
+
+            total_prices += net_prices
+            total_rent += net_rent
+            total_emi += net_emi
+            total_tax += net_tax
+            total_exp += net_exp
+            total_monthly_expense += net_monthly_expense
+            total_monthly_income += net_monthly_income
+            
+        }
+        document.getElementById("totalPrice").innerHTML = total_prices
+        document.getElementById("totalRent").innerHTML = total_rent
+        document.getElementById("totalEmi").innerHTML = total_emi
+        document.getElementById("totalTax").innerHTML = total_tax
+        document.getElementById("totalExp").innerHTML = total_exp
+        document.getElementById("totalMonthlyExpense").innerHTML = total_monthly_expense
+        document.getElementById("totalIncome").innerHTML = total_monthly_income
+
+
+        console.log(total_prices)
+        console.log(total_rent)
+        console.log(total_emi)
+        console.log(total_tax)
+        console.log(total_exp)
+        console.log(total_monthly_expense)
+        console.log(total_monthly_income)
+
+        const ctx = document.getElementById('incomeChart').getContext('2d');
+        const incomeChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: properties,
+                datasets: [{
+                    label: 'Income in dollers',
+                    data: net_incomes,
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                    ], 
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        const ctx2 = document.getElementById('expenseChart').getContext('2d');
+        const expenseChart = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: properties,
+                datasets: [{
+                    label: 'Expense in dollers',
+                    data: net_expenses,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                    ], 
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 99, 132, 1)',
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+
+
+        const ctx3 = document.getElementById('expenseSpreadChart').getContext('2d');
+        const expenseSpreadChart = new Chart(ctx3, {
+            type: 'bar',
+            data: {
+                labels: properties,
+                datasets: [{
+                    label: 'Monthly EMI',
+                    data: net_emis,
+                    backgroundColor: ['rgba(255, 206, 84, 0.2)'], 
+                    borderColor: ['rgba(255, 206, 84, 1)'],
+                    borderWidth: 1
+                }, {
+                    label: 'Monthly Tax',
+                    data: net_taxes,
+                    backgroundColor: ['rgba(205, 90, 13, 0.2)'], 
+                    borderColor: ['rgba(205, 90, 13, 1)'],
+                    borderWidth: 1
+                }, {
+                    label: 'Monthly Other Expenses',
+                    data: net_exps,
+                    backgroundColor: ['rgba(255, 99, 32, 0.2)'], 
+                    borderColor: ['rgba(255, 99, 32, 1)'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+
+        const ctx4 = document.getElementById('incomeSpreadChart').getContext('2d');
+        const incomeSpreadChart = new Chart(ctx4, {
+            type: 'pie',
+            data: {
+                labels: properties,
+                datasets: [{
+                    label: 'Income in dollers',
+                    data: net_incomes,
+                    backgroundColor: [
+                        'rgba(7, 192, 192, 0.2)',
+                        'rgba(70, 12, 142, 0.2)',
+                        'rgba(25, 92, 1, 0.2)',
+                        'rgba(4, 2, 2, 0.2)',
+                        'rgba(75, 100, 100, 0.2)',
+                    ], 
+                    borderColor: [
+                    'rgba(7, 192, 192, 1)',
+                        'rgba(70, 12, 142, 1)',
+                        'rgba(25, 92, 1, 1)',
+                        'rgba(4, 2, 2, 1)',
+                        'rgba(75, 100, 100, 1)',
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+
+    </script>
+    
+</body>
+</html>
