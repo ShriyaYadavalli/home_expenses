@@ -55,7 +55,7 @@ python manage.py runserver
 
 ## Usage
 
-1. Open your browser and go to `http://127.0.0.1:8000/`.
+1. Open your browser and go to `http://127.0.0.1:8000/hello/`.
 2. Upload a CSV file using the upload form.
 3. View the parsed data in a table.
 4. Scroll down to see interactive charts generated from the data.
