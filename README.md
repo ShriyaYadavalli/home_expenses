@@ -32,6 +32,36 @@ This project is a great example of integrating multiple technologies to create a
 
 ## Installation
 
+
+### Prerequisites
+
+- Python 3.7 or higher
+- Node.js (version 14 or higher recommended)
+- pip (Python package manager)
+- npm (comes with Node.js)
+
+### Setup Steps
+
+```bash
+# Clone the repository
+git clone https://github.com/your-username/data-analysis-visualization-app.git
+cd data-analysis-visualization-app
+
+# Create and activate virtual environment
+python -m venv env
+source env/bin/activate  # On Windows: env\Scripts\activate
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Install front-end dependencies
+npm install
+
+# Run Django migrations and start the server
+python manage.py migrate
+python manage.py runserver
+```
+
 To run this project locally:
 
 ```bash
